@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Processing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 50px;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 80%;
+            max-width: 600px;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        img {
+            margin-top: 20px;
+            max-width: 100%;
+            max-height: 500px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Upload Image for Processing</h1>
+        <input type="file" id="file-input" accept="image/*">
+        <button onclick="uploadImage()">Process Image</button>
+        <div id="output-container">
+            <h3>Processed Image:</h3>
+            <img id="output-image" src="" alt="Processed Image will appear here">
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            const fileInput = document.getElementById('file-input');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                alert("Please select an image to upload.");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // Show loading state (optional)
+            document.getElementById("output-image").src = "";
+            const outputContainer = document.getElementById('output-container');
+            outputContainer.innerHTML = "<h3>Processing...</h3>";
+
+            fetch('http://127.0.0.1:8000/process_image/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                const outputImage = document.getElementById('output-image');
+                outputImage.src = url;
+
+                // Update the output container
+                outputContainer.innerHTML = "<h3>Processed Image:</h3>";
+            })
+            .catch(error => {
+                console.error('Error processing the image:', error);
+                alert('Failed to process image. Please try again.');
+            });
+        }
+    </script>
+
+</body>
+</html>
